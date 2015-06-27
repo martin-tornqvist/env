@@ -1,0 +1,187 @@
+https://gist.github.com/soonhokong/7c2bf6e8b72dbc71c93b
+
+How to Setup emacs `irony-mode` in Ubuntu-12.04
+===============================================
+
+I recently found a nice emacs-mode, [irony-mode], which can be used
+with [company-mode], [flycheck-mode], and [eldoc-mode]. It works
+nicely with CMake-based projects. The document contains a list of
+instructions for setting things up. I assume that you're using a
+fresh-installed Ubuntu-12.04.5 (64-bit). It uses
+[Lean theorem prover][lean] as an example project.
+
+![irony-mode-company](https://cloud.githubusercontent.com/assets/403281/6703722/cef1d9ce-cd15-11e4-9219-b11fb82e5980.png)
+![irony-mode-eldoc](https://cloud.githubusercontent.com/assets/403281/6703724/cef458c0-cd15-11e4-9ca2-48d84e142d0a.png)
+![irony-mode-flycheck](https://cloud.githubusercontent.com/assets/403281/6703723/cef40dc0-cd15-11e4-8d33-a8345f78dd9c.png)
+
+[company-irony]: https://github.com/Sarcasm/irony-mode
+[irony-mode]: https://github.com/Sarcasm/company-irony
+[company-mode]: http://company-mode.github.io/
+[eldoc-mode]: http://emacswiki.org/emacs/ElDoc
+[flycheck-mode]: https://github.com/flycheck/flycheck
+[lean]: https://github.com/leanprover/lean
+
+
+Install Ubuntu Packages
+-----------------------
+
+1. emacs (24.4 or higher)
+
+    ```bash
+sudo apt-get install python-software-properties  # for add-apt-repository
+sudo add-apt-repository ppa:ubuntu-elisp/ppa
+sudo apt-get update
+sudo apt-get install emacs-snapshot
+    ```
+
+2. g++-4.8, clang-3.4 and libclang-3.4-dev
+
+    ```bash
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+sudo apt-get install g++-4.8 clang-3.4 libclang-3.4-dev
+    ```
+
+3. Required packages for compiling lean (optional)
+    ```bash
+sudo apt-get install git cmake liblua5.2-dev libmpfr-dev libgmp-dev make
+    ```
+
+Install emacs packages
+----------------------
+
+1. Setup [MELPA]
+
+  Have the following lines in your emacs setup (`.emacs` or `.emacs.d/init.el`):
+    ```el
+(require 'package) ;; You might already have this line
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.org/packages/") t)
+(when (< emacs-major-version 24)
+  ;; For important compatibility libraries like cl-lib
+  (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
+(package-initialize) ;; You might already have this line
+    ```
+
+[MELPA]: http://melpa.org
+
+2. Install irony, irony-eldoc, flycheck-irony, company-irony
+ - <kbd>M-x</kbd> `package-install` `irony`
+ - <kbd>M-x</kbd> `package-install` `irony-eldoc`
+ - <kbd>M-x</kbd> `package-install` `flycheck-irony`
+ - <kbd>M-x</kbd> `package-install` `company-irony`
+
+3. Install irony-server
+ - Open any `.cpp` file and make sure that `irony-mode` is on.
+ - <kbd>M-x</kbd> `irony-install-server`
+ - **Important**: To force `irony-server` to use `llvm-3.4`, you need to add cmake options
+   `-DLIBCLANG_INCLUDE_DIR=/usr/lib/llvm-3.4/include` and
+   `-DLIBCLANG_LIBRARY=/usr/lib/llvm-3.4/lib/libclang-3.4.so`
+
+4. Setup irony-mode
+
+  Have the following lines in your emacs setup (`.emacs` or `.emacs.d/init.el`):
+    ```el
+;; =============
+;; irony-mode
+;; =============
+(add-hook 'c++-mode-hook 'irony-mode)
+(add-hook 'c-mode-hook 'irony-mode)
+;; =============
+;; company mode
+;; =============
+(add-hook 'c++-mode-hook 'company-mode)
+(add-hook 'c-mode-hook 'company-mode)
+;; replace the `completion-at-point' and `complete-symbol' bindings in
+;; irony-mode's buffers by irony-mode's function
+(defun my-irony-mode-hook ()
+  (define-key irony-mode-map [remap completion-at-point]
+    'irony-completion-at-point-async)
+  (define-key irony-mode-map [remap complete-symbol]
+    'irony-completion-at-point-async))
+(add-hook 'irony-mode-hook 'my-irony-mode-hook)
+(add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+(eval-after-load 'company
+  '(add-to-list 'company-backends 'company-irony))
+;; (optional) adds CC special commands to `company-begin-commands' in order to
+;; trigger completion at interesting places, such as after scope operator
+;;     std::|
+(add-hook 'irony-mode-hook 'company-irony-setup-begin-commands)
+;; =============
+;; flycheck-mode
+;; =============
+(add-hook 'c++-mode-hook 'flycheck-mode)
+(add-hook 'c-mode-hook 'flycheck-mode)
+(eval-after-load 'flycheck
+  '(add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
+;; =============
+;; eldoc-mode
+;; =============
+(add-hook 'irony-mode-hook 'irony-eldoc)
+;; ==========================================
+;; (optional) bind TAB for indent-or-complete
+;; ==========================================
+(defun irony--check-expansion ()
+  (save-excursion
+    (if (looking-at "\\_>") t
+      (backward-char 1)
+      (if (looking-at "\\.") t
+        (backward-char 1)
+        (if (looking-at "->") t nil)))))
+(defun irony--indent-or-complete ()
+  "Indent or Complete"
+  (interactive)
+  (cond ((and (not (use-region-p))
+              (irony--check-expansion))
+         (message "complete")
+         (company-complete-common))
+        (t
+         (message "indent")
+         (call-interactively 'c-indent-line-or-region))))
+(defun irony-mode-keys ()
+  "Modify keymaps used by `irony-mode'."
+  (local-set-key (kbd "TAB") 'irony--indent-or-complete)
+  (local-set-key [tab] 'irony--indent-or-complete))
+(add-hook 'c-mode-common-hook 'irony-mode-keys)
+     ```
+
+Compile Lean to generate `compile_commands.json`
+-----------------------------------------------
+
+[irony-mode] relies on `compile_commands.json` file to collect
+compilation information. This can be generated by using cmake option
+`CMAKE_EXPORT_COMPILE_COMMANDS`:
+
+```bash
+cd lean
+mkdir -p build/debug-clang
+cd build/debug-clang
+cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ../../src
+```
+
+Set up irony-mode for Lean
+--------------------------
+
+Make a symbolic link from `lean/build/debug-clang/compile_commands.json` to `lean/src/compile_commands.json`.
+
+```bash
+cd lean/src
+ln -s ../build/debug-clang/compile_commands.json
+```
+
+If you find a better of doing this, please let me know.
+
+
+Known Issues
+------------
+
+ - eldoc-mode might gives you `eldoc error: (void-function
+   async-flag)` or `eldoc error: (void-function remove-if-not)`. This
+   is due to the use of obsolete functions in
+   `~/.emacs.d/elpa/irony-eldoc-20YYMMDD.HHMM/irony-eldoc.el` file. To
+   fix this problem,
+
+    1. replace `remove-if-not` with `cl-remove-if-not`, and
+    2. replace `lexical-let` with `let`.
+   
+   I submitted a [bug report](https://github.com/ikirill/irony-eldoc/issues/5)
+   for this problem.

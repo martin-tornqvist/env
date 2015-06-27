@@ -2,8 +2,8 @@
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
 (package-initialize)
 
-;; (when (not package-archive-contents)
-;;   (package-refresh-contents))
+(when (not package-archive-contents)
+  (package-refresh-contents))
 
 ;; =============
 ;; irony-mode
@@ -73,38 +73,6 @@
 (add-hook 'c-mode-common-hook 'irony-mode-keys)
 
 
-;; (require 'package)
-;; (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
-;; (package-initialize)
-
-;; (when (not package-archive-contents)
-;;   (package-refresh-contents))
-
-;; (add-hook 'c++-mode-hook 'irony-mode)
-;; (add-hook 'c-mode-hook 'irony-mode)
-;; (add-hook 'objc-mode-hook 'irony-mode)
- 
-;; replace the `completion-at-point' and `complete-symbol' bindings in
-;; irony-mode's buffers by irony-mode's function
-;; (defun my-irony-mode-hook ()
-;;   (define-key irony-mode-map [remap completion-at-point]
-;;     'irony-completion-at-point-async)
-;;   (define-key irony-mode-map [remap complete-symbol]
-;;     'irony-completion-at-point-async))
-;; (add-hook 'irony-mode-hook 'my-irony-mode-hook)
-;; (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
-
-;; (eval-after-load 'company
-;;   '(add-to-list 'company-backends 'company-irony))
-
-
-
-
-
-
-
-
-
 
 
 (add-to-list 'default-frame-alist '(width . 160))
@@ -118,7 +86,7 @@
 
 (add-to-list 'custom-theme-load-path "/home/martin/.emacs.d/cyberpunk-theme.el")
 
-(setq backup-directory-alist `(("." . "~/emacs_backups")))
+(setq backup-directory-alist `(("." . "~/emacs-backups")))
 
 ;; Rust mode
 (add-to-list 'load-path "/home/martin/.emacs.d/rust-mode/")
