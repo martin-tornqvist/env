@@ -1,3 +1,4 @@
+
 ;; ============================================================================
 ;; TODO: What does this do?
 ;; ============================================================================
@@ -22,75 +23,97 @@
 ;; U-x upgrades all packages
 ;;
 
-;; ============================================================================
-;; Racer - Code completion for Rust
-;; ============================================================================
-(setq racer-cmd "/home/martin/.cargo/bin/racer")
-(setq racer-rust-src-path "/home/martin/dev/rust.git/src/")
-
-;; Activate Racer when rust-mode starts
-(add-hook 'rust-mode-hook #'racer-mode)
+;; "Emacs as IDE" guide:
+;; https://tuhdo.github.io/c-ide.html
 
 ;; ============================================================================
-;; Rustfmt - Code formatting for Rust
+;; Common
 ;; ============================================================================
-;; Bind a keyboard shortcut to rustfmt
-(eval-after-load 'rust-mode
-  '(define-key rust-mode-map (kbd "C-c C-f") #'rustfmt-format-buffer))
+;; Helm (incremental search system, it's pretty awesome)
 
-;; Format on save when using Rust mode
-;;(add-hook 'rust-mode-hook #'rustfmt-enable-on-save)
+;; NOTE: helm-swoop seems pretty darned nice, perhaps try it sometimes
+
+(require 'helm-config)
+(require 'helm-grep)
+
+;; The default "C-x c" is quite close to "C-x C-c", which quits Emacs.
+;; Changed to "C-c h". Note: We must set "C-c h" globally, because we
+;; cannot change `helm-command-prefix-key' once `helm-config' is loaded.
+(global-set-key (kbd "C-c h") 'helm-command-prefix)
+(global-unset-key (kbd "C-x c"))
+
+(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to do persistent action
+(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB works in terminal
+(define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
+
+(define-key helm-grep-mode-map (kbd "<return>")  'helm-grep-mode-jump-other-window)
+(define-key helm-grep-mode-map (kbd "n")  'helm-grep-mode-jump-other-window-forward)
+(define-key helm-grep-mode-map (kbd "p") 'helm-grep-mode-jump-other-window-backward)
+
+(add-to-list 'helm-sources-using-default-as-input 'helm-source-man-pages)
+
+(global-set-key (kbd "M-x") 'helm-M-x)
+(global-set-key (kbd "M-y") 'helm-show-kill-ring)
+(global-set-key (kbd "C-x b") 'helm-mini)
+(global-set-key (kbd "C-x C-f") 'helm-find-files)
+(global-set-key (kbd "C-h SPC") 'helm-all-mark-rings)
+(global-set-key (kbd "C-c h o") 'helm-occur)
+(global-set-key (kbd "C-c h x") 'helm-register)
+(define-key 'help-command (kbd "C-f") 'helm-apropos)
+(define-key 'help-command (kbd "r") 'helm-info-emacs)
+(define-key 'help-command (kbd "C-l") 'helm-locate-library)
 
 ;; ============================================================================
-;; Flycheck-mode - Modern on the fly syntax checking
+;; C/C++
 ;; ============================================================================
-;; TODO: What does this actually do...?
-(add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
+;; GNU Global source code tagging system
+(setq
+ helm-gtags-ignore-case t
+ helm-gtags-auto-update t
+ helm-gtags-pulse-at-cursor t
+ helm-gtags-prefix-key "\C-c g"
+ helm-gtags-suggested-key-mapping t
+ )
 
-;; Activate flycheck-mode when rust-mode starts
-(add-hook 'rust-mode-hook #'flycheck-mode)
+;; helm-gtags-use-input-at-cursor t
 
-;; Activate some extra flycheck stuff when flycheck-mode starts
-(add-hook 'flycheck-mode-hook #'flycheck-pos-tip-mode)
-(add-hook 'flycheck-mode-hook #'flycheck-color-mode-line-mode)
+(require 'helm-gtags)
+;; Enable helm-gtags-mode
+(add-hook 'dired-mode-hook 'helm-gtags-mode)
+(add-hook 'eshell-mode-hook 'helm-gtags-mode)
+(add-hook 'c-mode-hook 'helm-gtags-mode)
+(add-hook 'c++-mode-hook 'helm-gtags-mode)
+(add-hook 'asm-mode-hook 'helm-gtags-mode)
 
-;; ============================================================================
+(define-key helm-gtags-mode-map (kbd "C-c g a") 'helm-gtags-tags-in-this-function)
+(define-key helm-gtags-mode-map (kbd "C-j") 'helm-gtags-select)
+(define-key helm-gtags-mode-map (kbd "M-.") 'helm-gtags-dwim)
+(define-key helm-gtags-mode-map (kbd "M-,") 'helm-gtags-pop-stack)
+(define-key helm-gtags-mode-map (kbd "C-c <") 'helm-gtags-previous-history)
+(define-key helm-gtags-mode-map (kbd "C-c >") 'helm-gtags-next-history)
+
+
 ;; Eldoc-mode - show function call signatures in echo area
-;; ============================================================================
-;; NOTE: Disabling eldoc for now, since it causes emacs to freeze in some
-;; situations (for unknown reason). Try enabling it again later, perhaps when
-;; new versions have been released. /2016-02-25
-;(add-hook 'racer-mode-hook #'eldoc-mode)
+;(add-hook 'c++-mode-hook #'eldoc-mode)
+;(add-hook 'c-mode-hook #'eldoc-mode)
 
-;; ============================================================================
 ;; Irony-mode (C/C++ Minor mode)
-;; ============================================================================
-(add-hook 'c++-mode-hook 'irony-mode)
-(add-hook 'c-mode-hook 'irony-mode)
+;(add-hook 'c++-mode-hook 'irony-mode)
+;(add-hook 'c-mode-hook 'irony-mode)
 
-;; ============================================================================
 ;; Company mode ("Complete anything") - A text completion framework for emacs
-;; ============================================================================
 ;; Activate Company when c++-mode starts
-(add-hook 'c++-mode-hook #'company-mode)
+;(add-hook 'c++-mode-hook 'global-company-mode)
 
 ;; Activate Company when c-mode starts
-(add-hook 'c-mode-hook #'company-mode)
+;(add-hook 'c-mode-hook 'global-company-mode)
 
-;; NOTE: Disabling company for now, since it causes emacs to freeze in some
-;; situations (for unknown reason). Try enabling it again later, perhaps when
-;; new versions have been released. /2016-02-25
-;; Activate Company when racer-mode starts
-;;(add-hook 'racer-mode-hook #'company-mode)
+;(eval-after-load 'company
+;  '(define-key company-mode-map (kbd "TAB") #'company-indent-or-complete-common))
 
-(eval-after-load 'company
-  '(define-key company-mode-map (kbd "TAB") #'company-indent-or-complete-common))
+;(setq company-tooltip-align-annotations t)
 
-(setq company-tooltip-align-annotations t)
-
-;; ============================================================================
-;; C style
-;; ============================================================================
+;; Style
 (setq c-default-style "bsd")
 (setq-default c-basic-offset 4)
 
@@ -102,6 +125,48 @@
 (c-add-style "my-cc-mode" my-cc-style)
 
 ;; ============================================================================
+;; Rust
+;; ============================================================================
+;; Racer - Code completion for Rust
+(setq racer-cmd "/home/martin/.cargo/bin/racer")
+(setq racer-rust-src-path "/home/martin/dev/rust.git/src/")
+
+;; Activate Racer when rust-mode starts
+(add-hook 'rust-mode-hook #'racer-mode)
+
+;; Rustfmt - Code formatting for Rust
+
+;; Bind a keyboard shortcut to rustfmt
+(eval-after-load 'rust-mode
+  '(define-key rust-mode-map (kbd "C-c C-f") #'rustfmt-format-buffer))
+
+;; Format on save when using Rust mode
+;(add-hook 'rust-mode-hook #'rustfmt-enable-on-save)
+
+;; Flycheck-mode - Modern on the fly syntax checking
+;; TODO: What does this actually do...?
+(add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
+
+;; Activate flycheck-mode when rust-mode starts
+(add-hook 'rust-mode-hook #'flycheck-mode)
+
+;; Activate some extra flycheck stuff when flycheck-mode starts
+(add-hook 'flycheck-mode-hook #'flycheck-pos-tip-mode)
+(add-hook 'flycheck-mode-hook #'flycheck-color-mode-line-mode)
+
+;; Eldoc-mode - show function call signatures in echo area
+;(add-hook 'racer-mode-hook #'eldoc-mode)
+
+;; Activate Company when racer-mode starts
+;(add-hook 'racer-mode-hook 'global-company-mode)
+
+(eval-after-load 'company
+  '(define-key company-mode-map (kbd "TAB") #'company-indent-or-complete-common))
+
+(setq company-tooltip-align-annotations t)
+
+
+;; ============================================================================
 ;; Misc
 ;; ============================================================================
 ;; Theme
@@ -111,12 +176,16 @@
 (setq backup-directory-alist `(("." . "~/emacs-backups")))
 
 ;; Frame sizes and splitting
-;;(add-to-list 'default-frame-alist '(width . 200))
-;;(add-to-list 'default-frame-alist '(height . 50))
-;;(add-to-list 'default-frame-alist '(left . 20))
-;;(add-to-list 'default-frame-alist '(top . 30))
-;;(setq split-height-threshold 40) 
-;;(setq split-width-threshold 80)
+;(add-to-list 'default-frame-alist '(fullscreen . maximized))
+
+;(add-to-list 'default-frame-alist '(width  . 100))
+;(add-to-list 'default-frame-alist '(height . 40))
+
+;(add-to-list 'default-frame-alist '(left   . 200))
+;(add-to-list 'default-frame-alist '(top    . 160))
+
+;(setq split-height-threshold 40) 
+;(setq split-width-threshold 80)
 
 ;; No tab characters!
 (setq-default indent-tabs-mode nil)
@@ -126,13 +195,17 @@
 (add-to-list 'same-window-buffer-names "*Help*")
 (add-to-list 'same-window-buffer-names "*Buffer List*")
 
+;; Always follow symbolic links
+(setq vc-follow-symlinks t)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ansi-color-names-vector ["#212526" "#ff4b4b" "#b4fa70" "#fce94f" "#729fcf" "#ad7fa8" "#8cc4ff" "#eeeeec"])
  '(column-number-mode t)
- '(custom-enabled-themes (quote (cyberpunk)))
+ '(custom-enabled-themes (quote (wombat)))
  '(custom-safe-themes (quote ("cd0ae83bc6c947021a6507b5fbae87c33411ff8d6f3a9bf554ce8fed17274bf8" default)))
  '(inhibit-startup-screen t)
  '(scroll-bar-mode nil)

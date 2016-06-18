@@ -97,7 +97,7 @@ fi
 # =============================================================================
 alias ll="ls -alhF --group-directories-first"
 alias l="ll"
-alias emacs="emacs -fs -f split-window-horizontally"
+alias emacs="emacs -fs"
 alias bashrc="emacs ~/.bashrc &"
 
 alias findf="find . -type f -name "
@@ -110,7 +110,7 @@ alias b="cd -"
 alias dev="cd ~/dev"
 
 # Go to Infra Arcana dev repo
-alias ia="cd ~/dev/ia.git"
+alias ia="cd ~/dev/ia"
 
 # Preferred C/C++ compilers (used by CMake)
   C=clang-3.6
@@ -121,3 +121,4 @@ CXX=clang++-3.6
 # =============================================================================
 # Cargo - Rust "crate host"
 PATH=$PATH:/home/martin/.cargo/bin
+
