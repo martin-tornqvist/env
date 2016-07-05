@@ -98,7 +98,7 @@ fi
 alias ll="ls -alhF --group-directories-first"
 alias l="ll"
 alias emacs="emacs -fs"
-alias bashrc="emacs ~/.bashrc &"
+alias bashrc="emacs $HOME/.bashrc &"
 
 alias findf="find . -type f -name "
 alias gg="git grep"
@@ -107,18 +107,21 @@ alias u="cd .."
 alias b="cd -"
 
 # Go to dev folder
-alias dev="cd ~/dev"
+alias dev="cd $HOME/dev"
 
 # Go to Infra Arcana dev repo
-alias ia="cd ~/dev/ia"
+alias ia="cd $HOME/dev/ia"
 
 # Preferred C/C++ compilers (used by CMake)
-  C=clang-3.6
-CXX=clang++-3.6
+export   C=clang-3.6
+export CXX=clang++-3.6
 
 # =============================================================================
-# Setup the PATH variable
+# Rust stuff
 # =============================================================================
 # Cargo - Rust "crate host"
-PATH=$PATH:/home/martin/.cargo/bin
+export PATH=$PATH:/home/martin/.cargo/bin
 
+export RUST_SRC_PATH=/home/martin/dev/rust/src
+
+export CARGO_HOME=/home/martin/.cargo

@@ -1,8 +1,7 @@
-
 ;; ============================================================================
 ;; TODO: What does this do?
 ;; ============================================================================
-;(require 'cl-lib)
+;; (require 'cl-lib)
 (require 'cl)
 
 ;; ============================================================================
@@ -25,6 +24,7 @@
 
 ;; "Emacs as IDE" guide:
 ;; https://tuhdo.github.io/c-ide.html
+
 
 ;; ============================================================================
 ;; Common
@@ -63,10 +63,23 @@
 (define-key 'help-command (kbd "r") 'helm-info-emacs)
 (define-key 'help-command (kbd "C-l") 'helm-locate-library)
 
+;; Enable company globally for all mode
+(global-company-mode)
+
+;; Reduce the time after which the company auto completion popup opens
+(setq company-idle-delay 0.2)
+
+;; Reduce the number of characters before company kicks in
+(setq company-minimum-prefix-length 1)
+
+(setq company-tooltip-align-annotations t)
+
 ;; ============================================================================
 ;; C/C++
 ;; ============================================================================
 ;; GNU Global source code tagging system
+;; NOTE: To create tags, run "gtags" in the root folder of the project.
+;; gtags is available through the apt package "global"
 (setq
  helm-gtags-ignore-case t
  helm-gtags-auto-update t
@@ -92,26 +105,31 @@
 (define-key helm-gtags-mode-map (kbd "C-c <") 'helm-gtags-previous-history)
 (define-key helm-gtags-mode-map (kbd "C-c >") 'helm-gtags-next-history)
 
-
 ;; Eldoc-mode - show function call signatures in echo area
-;(add-hook 'c++-mode-hook #'eldoc-mode)
-;(add-hook 'c-mode-hook #'eldoc-mode)
+;; (add-hook 'c++-mode-hook #'eldoc-mode)
+;; (add-hook 'c-mode-hook #'eldoc-mode)
 
 ;; Irony-mode (C/C++ Minor mode)
-;(add-hook 'c++-mode-hook 'irony-mode)
-;(add-hook 'c-mode-hook 'irony-mode)
+;; (add-hook 'c++-mode-hook 'irony-mode)
+;; (add-hook 'c-mode-hook 'irony-mode)
 
 ;; Company mode ("Complete anything") - A text completion framework for emacs
 ;; Activate Company when c++-mode starts
-;(add-hook 'c++-mode-hook 'global-company-mode)
+;; (require 'company)
+;; (add-hook 'c++-mode-hook 'global-company-mode)
+
+;; (setq company-backends (delete 'company-semantic company-backends))
+;; (define-key c-mode-map  [(tab)] 'company-complete)
+;; (define-key c++-mode-map  [(tab)] 'company-complete)
+
+;; (eval-after-load 'company
+;;   '(define-key company-mode-map (kbd "TAB") #'company-indent-or-complete-common))
 
 ;; Activate Company when c-mode starts
-;(add-hook 'c-mode-hook 'global-company-mode)
+;; (add-hook 'c-mode-hook 'global-company-mode)
 
-;(eval-after-load 'company
-;  '(define-key company-mode-map (kbd "TAB") #'company-indent-or-complete-common))
-
-;(setq company-tooltip-align-annotations t)
+;; (eval-after-load 'company
+;;   '(define-key company-mode-map (kbd "TAB") #'company-indent-or-complete-common))
 
 ;; Style
 (setq c-default-style "bsd")
@@ -124,47 +142,49 @@
 
 (c-add-style "my-cc-mode" my-cc-style)
 
+
 ;; ============================================================================
 ;; Rust
 ;; ============================================================================
 ;; Racer - Code completion for Rust
 (setq racer-cmd "/home/martin/.cargo/bin/racer")
-(setq racer-rust-src-path "/home/martin/dev/rust.git/src/")
+(setq racer-rust-src-path "/home/martin/dev/rust/src/")
 
-;; Activate Racer when rust-mode starts
-(add-hook 'rust-mode-hook #'racer-mode)
+;; Load rust-mode when you open `.rs` files
+(add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
 
-;; Rustfmt - Code formatting for Rust
+;; Setting up configurations when you load rust-mode
+(add-hook 'rust-mode-hook
+     '(lambda ()
+     ;; Racer (Rust Auto Complete-er)
+     (racer-mode)
+
+     ;; NOTE:
+     ;; M-. jumps to declaration
+     ;; M-, jumps back
+
+     ;; Hook in racer with eldoc to provide documentation
+     (racer-turn-on-eldoc)
+
+     ;; Flycheck ("Modern on the fly syntax checking")
+     (flycheck-mode)
+
+     ;; Use flycheck-rust in rust-mode
+     (flycheck-rust-setup)
+
+     ;; Use company-racer in rust mode
+     (set (make-local-variable 'company-backends) '(company-racer))
+
+     ;; Key binding to auto complete and indent
+     (local-set-key (kbd "TAB") #'company-indent-or-complete-common)
+
+     ;; Format on save
+     (rustfmt-enable-on-save)
+     ))
 
 ;; Bind a keyboard shortcut to rustfmt
-(eval-after-load 'rust-mode
-  '(define-key rust-mode-map (kbd "C-c C-f") #'rustfmt-format-buffer))
-
-;; Format on save when using Rust mode
-;(add-hook 'rust-mode-hook #'rustfmt-enable-on-save)
-
-;; Flycheck-mode - Modern on the fly syntax checking
-;; TODO: What does this actually do...?
-(add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
-
-;; Activate flycheck-mode when rust-mode starts
-(add-hook 'rust-mode-hook #'flycheck-mode)
-
-;; Activate some extra flycheck stuff when flycheck-mode starts
-(add-hook 'flycheck-mode-hook #'flycheck-pos-tip-mode)
-(add-hook 'flycheck-mode-hook #'flycheck-color-mode-line-mode)
-
-;; Eldoc-mode - show function call signatures in echo area
-;(add-hook 'racer-mode-hook #'eldoc-mode)
-
-;; Activate Company when racer-mode starts
-;(add-hook 'racer-mode-hook 'global-company-mode)
-
-(eval-after-load 'company
-  '(define-key company-mode-map (kbd "TAB") #'company-indent-or-complete-common))
-
-(setq company-tooltip-align-annotations t)
-
+;; (eval-after-load 'rust-mode
+;;   '(define-key rust-mode-map (kbd "C-c C-f") #'rustfmt-format-buffer))
 
 ;; ============================================================================
 ;; Misc
@@ -176,16 +196,16 @@
 (setq backup-directory-alist `(("." . "~/emacs-backups")))
 
 ;; Frame sizes and splitting
-;(add-to-list 'default-frame-alist '(fullscreen . maximized))
+;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
-;(add-to-list 'default-frame-alist '(width  . 100))
-;(add-to-list 'default-frame-alist '(height . 40))
+;; (add-to-list 'default-frame-alist '(width  . 100))
+;; (add-to-list 'default-frame-alist '(height . 40))
 
-;(add-to-list 'default-frame-alist '(left   . 200))
-;(add-to-list 'default-frame-alist '(top    . 160))
+;; (add-to-list 'default-frame-alist '(left   . 200))
+;; (add-to-list 'default-frame-alist '(top    . 160))
 
-;(setq split-height-threshold 40) 
-;(setq split-width-threshold 80)
+;; (setq split-height-threshold 40) 
+;; (setq split-width-threshold 80)
 
 ;; No tab characters!
 (setq-default indent-tabs-mode nil)
