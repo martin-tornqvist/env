@@ -22,25 +22,16 @@
 ;; U-x upgrades all packages
 ;;
 
-;; "Emacs as IDE" guide:
-;; https://tuhdo.github.io/c-ide.html
-
 
 ;; ============================================================================
 ;; Common
 ;; ============================================================================
 ;; Helm (incremental search system, it's pretty awesome)
 
-;; NOTE: helm-swoop seems pretty darned nice, perhaps try it sometimes
+;; NOTE: helm-swoop seems nice, perhaps try it sometimes
 
 (require 'helm-config)
 (require 'helm-grep)
-
-;; The default "C-x c" is quite close to "C-x C-c", which quits Emacs.
-;; Changed to "C-c h". Note: We must set "C-c h" globally, because we
-;; cannot change `helm-command-prefix-key' once `helm-config' is loaded.
-(global-set-key (kbd "C-c h") 'helm-command-prefix)
-(global-unset-key (kbd "C-x c"))
 
 (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to do persistent action
 (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB works in terminal
@@ -52,6 +43,7 @@
 
 (add-to-list 'helm-sources-using-default-as-input 'helm-source-man-pages)
 
+;; Override some common commands with Helm-style variants
 (global-set-key (kbd "M-x") 'helm-M-x)
 (global-set-key (kbd "M-y") 'helm-show-kill-ring)
 (global-set-key (kbd "C-x b") 'helm-mini)
@@ -64,72 +56,84 @@
 (define-key 'help-command (kbd "C-l") 'helm-locate-library)
 
 ;; Enable company globally for all mode
+(require 'company)
 (global-company-mode)
-
-;; Reduce the time after which the company auto completion popup opens
-(setq company-idle-delay 0.2)
-
-;; Reduce the number of characters before company kicks in
+(setq company-idle-delay nil)
 (setq company-minimum-prefix-length 1)
-
 (setq company-tooltip-align-annotations t)
+
+;; GNU Global source code tagging system
+;; NOTE: To create tags, run "gtags" in the root folder of the project.
+;; gtags is available through the apt package "global"
+(require 'helm-gtags)
+
+(setq
+  helm-gtags-ignore-case t
+  helm-gtags-auto-update t
+  helm-gtags-pulse-at-cursor t
+  helm-gtags-prefix-key "\C-c g"
+  helm-gtags-suggested-key-mapping t
+  helm-gtags-use-input-at-cursor t
+  )
+
+(define-key helm-gtags-mode-map (kbd "M-.") 'helm-gtags-dwim)
+(define-key helm-gtags-mode-map (kbd "M-,") 'helm-gtags-pop-stack)
+
+;; NOTE: type M-x helm to discover helm or helm-gtags functions
+
+;; Map Helm key(s) to something more convenient
+;; NOTE: C-x c is the 'helm-command-prefix'
+;; Find files
+(define-key key-translation-map [f5] (kbd "\C-x c f"))
+
+;; Shortcut keys for helm-gtags key(s)
+;; Find pattern
+(define-key helm-gtags-mode-map (kbd "<f6>") 'helm-gtags-find-pattern)
 
 ;; ============================================================================
 ;; C/C++
 ;; ============================================================================
-;; GNU Global source code tagging system
-;; NOTE: To create tags, run "gtags" in the root folder of the project.
-;; gtags is available through the apt package "global"
-(setq
- helm-gtags-ignore-case t
- helm-gtags-auto-update t
- helm-gtags-pulse-at-cursor t
- helm-gtags-prefix-key "\C-c g"
- helm-gtags-suggested-key-mapping t
- )
+(require 'irony)
+(require 'company-irony-c-headers)
 
-;; helm-gtags-use-input-at-cursor t
+(setq company-clang-executable "clang++-3.6")
 
-(require 'helm-gtags)
-;; Enable helm-gtags-mode
-(add-hook 'dired-mode-hook 'helm-gtags-mode)
-(add-hook 'eshell-mode-hook 'helm-gtags-mode)
-(add-hook 'c-mode-hook 'helm-gtags-mode)
-(add-hook 'c++-mode-hook 'helm-gtags-mode)
-(add-hook 'asm-mode-hook 'helm-gtags-mode)
+;; (Yes, it really should be two dashes...)
+(setq company-irony-c-headers--compiler-executable "clang++-3.6")
 
-(define-key helm-gtags-mode-map (kbd "C-c g a") 'helm-gtags-tags-in-this-function)
-(define-key helm-gtags-mode-map (kbd "C-j") 'helm-gtags-select)
-(define-key helm-gtags-mode-map (kbd "M-.") 'helm-gtags-dwim)
-(define-key helm-gtags-mode-map (kbd "M-,") 'helm-gtags-pop-stack)
-(define-key helm-gtags-mode-map (kbd "C-c <") 'helm-gtags-previous-history)
-(define-key helm-gtags-mode-map (kbd "C-c >") 'helm-gtags-next-history)
+(setq flycheck-c/c++-clang-executable "clang++-3.6")
 
-;; Eldoc-mode - show function call signatures in echo area
-;; (add-hook 'c++-mode-hook #'eldoc-mode)
-;; (add-hook 'c-mode-hook #'eldoc-mode)
+;; Setting up configurations when c++-mode loads
+(add-hook 'c++-mode-hook
+  '(lambda ()
 
-;; Irony-mode (C/C++ Minor mode)
-;; (add-hook 'c++-mode-hook 'irony-mode)
-;; (add-hook 'c-mode-hook 'irony-mode)
+  (irony-mode)
 
-;; Company mode ("Complete anything") - A text completion framework for emacs
-;; Activate Company when c++-mode starts
-;; (require 'company)
-;; (add-hook 'c++-mode-hook 'global-company-mode)
+  (helm-gtags-mode)
 
-;; (setq company-backends (delete 'company-semantic company-backends))
-;; (define-key c-mode-map  [(tab)] 'company-complete)
-;; (define-key c++-mode-map  [(tab)] 'company-complete)
+  ;; Eldoc-mode - show function call signatures in echo area
+  (eldoc-mode)
+  (irony-eldoc)
 
-;; (eval-after-load 'company
-;;   '(define-key company-mode-map (kbd "TAB") #'company-indent-or-complete-common))
+  ;; Flycheck ("Modern on the fly syntax checking")
+  (flycheck-mode)
+  (flycheck-irony-setup)
 
-;; Activate Company when c-mode starts
-;; (add-hook 'c-mode-hook 'global-company-mode)
+  (set (make-local-variable 'company-backends) '(company-clang company-irony-c-headers company-irony))
 
-;; (eval-after-load 'company
-;;   '(define-key company-mode-map (kbd "TAB") #'company-indent-or-complete-common))
+  (define-key irony-mode-map [remap completion-at-point]
+    'irony-completion-at-point-async)
+
+  (define-key irony-mode-map [remap complete-symbol]
+    'irony-completion-at-point-async)
+
+  (company-irony-setup-begin-commands)
+
+  (irony-cdb-autosetup-compile-options)
+
+  ;; Key binding to auto complete and indent
+  (local-set-key (kbd "TAB") #'company-indent-or-complete-common)
+  ))
 
 ;; Style
 (setq c-default-style "bsd")
@@ -153,34 +157,34 @@
 ;; Load rust-mode when you open `.rs` files
 (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
 
-;; Setting up configurations when you load rust-mode
+;; Setting up configurations when rust-mode loads
 (add-hook 'rust-mode-hook
-     '(lambda ()
-     ;; Racer (Rust Auto Complete-er)
-     (racer-mode)
+  '(lambda ()
+  ;; Racer (Rust Auto Complete-er)
+  (racer-mode)
 
-     ;; NOTE:
-     ;; M-. jumps to declaration
-     ;; M-, jumps back
+  ;; NOTE:
+  ;; M-. jumps to declaration
+  ;; M-, jumps back
 
-     ;; Hook in racer with eldoc to provide documentation
-     (racer-turn-on-eldoc)
+  ;; Hook in racer with eldoc to provide documentation
+  (racer-turn-on-eldoc)
 
-     ;; Flycheck ("Modern on the fly syntax checking")
-     (flycheck-mode)
+  ;; Flycheck ("Modern on the fly syntax checking")
+  (flycheck-mode)
 
-     ;; Use flycheck-rust in rust-mode
-     (flycheck-rust-setup)
+  ;; Use flycheck-rust in rust-mode
+  (flycheck-rust-setup)
 
-     ;; Use company-racer in rust mode
-     (set (make-local-variable 'company-backends) '(company-racer))
+  ;; Use company-racer in rust mode
+  (set (make-local-variable 'company-backends) '(company-racer))
 
-     ;; Key binding to auto complete and indent
-     (local-set-key (kbd "TAB") #'company-indent-or-complete-common)
+  ;; Key binding to auto complete and indent
+  (local-set-key (kbd "TAB") #'company-indent-or-complete-common)
 
-     ;; Format on save
-     (rustfmt-enable-on-save)
-     ))
+  ;; Format on save
+  (rustfmt-enable-on-save)
+  ))
 
 ;; Bind a keyboard shortcut to rustfmt
 ;; (eval-after-load 'rust-mode
@@ -228,6 +232,7 @@
  '(custom-enabled-themes (quote (wombat)))
  '(custom-safe-themes (quote ("cd0ae83bc6c947021a6507b5fbae87c33411ff8d6f3a9bf554ce8fed17274bf8" default)))
  '(inhibit-startup-screen t)
+ '(safe-local-variable-values (quote ((company-c-headers-path-user quote ("include" "rl_utils/include")) (company-clang-arguments "-std=c++11" "-I/usr/include/SDL2" "-Iinclude" "-Irl_utils/include") (company-c-headers-path-user quote ("/home/martin/dev/ia/include")) (company-clang-arguments "-std=c++11" "-I/usr/include/SDL2" "-I/home/martin/dev/ia/include" "-I/home/martin/dev/ia/rl_utils/include") (company-clang-arguments "-std=c++11" "-I/home/martin/dev/ia/include" "-I/home/martin/dev/ia/rl_utils/include" "-I/usr/include/SDL2"))))
  '(scroll-bar-mode nil)
  '(show-paren-mode t)
  '(tool-bar-mode nil))
