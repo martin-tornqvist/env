@@ -27,15 +27,22 @@
 ;; Common
 ;; ============================================================================
 ;; Helm (incremental search system, it's pretty awesome)
-
 ;; NOTE: helm-swoop seems nice, perhaps try it sometimes
-
 (require 'helm-config)
 (require 'helm-grep)
 
-(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to do persistent action
-(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB works in terminal
-(define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
+;; Tab to tab stop
+(global-set-key (kbd "<C-tab>") 'tab-to-tab-stop)
+(setq tab-stop-list (number-sequence 4 200 4))
+
+;; Rebind tab to do persistent action
+(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action)
+
+;; Make TAB works in terminal
+(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action)
+
+;; List actions using C-z
+(define-key helm-map (kbd "C-z")  'helm-select-action)
 
 (define-key helm-grep-mode-map (kbd "<return>")  'helm-grep-mode-jump-other-window)
 (define-key helm-grep-mode-map (kbd "n")  'helm-grep-mode-jump-other-window-forward)
@@ -67,14 +74,12 @@
 ;; gtags is available through the apt package "global"
 (require 'helm-gtags)
 
-(setq
-  helm-gtags-ignore-case t
-  helm-gtags-auto-update t
-  helm-gtags-pulse-at-cursor t
-  helm-gtags-prefix-key "\C-c g"
-  helm-gtags-suggested-key-mapping t
-  helm-gtags-use-input-at-cursor t
-  )
+(setq helm-gtags-ignore-case t
+      helm-gtags-auto-update t
+      helm-gtags-pulse-at-cursor t
+      helm-gtags-prefix-key "\C-c g"
+      helm-gtags-suggested-key-mapping t
+      helm-gtags-use-input-at-cursor t)
 
 (define-key helm-gtags-mode-map (kbd "M-.") 'helm-gtags-dwim)
 (define-key helm-gtags-mode-map (kbd "M-,") 'helm-gtags-pop-stack)
@@ -90,61 +95,89 @@
 ;; Find pattern
 (define-key helm-gtags-mode-map (kbd "<f6>") 'helm-gtags-find-pattern)
 
+;; Whitespace mode
+;; NOTE: Set whitespace-line-column in projects dir_locals file
+;;       (May requiring restarting whitespace-mode afterwards)
+(require 'whitespace)
+(setq whitespace-style '(face empty tabs lines-tail trailing))
+(global-whitespace-mode t)
+
+;; Numbered windows (jump to specific window with M-#)
+(require 'window-numbering)
+(window-numbering-mode)
+
 ;; ============================================================================
 ;; C/C++
 ;; ============================================================================
 (require 'irony)
 (require 'company-irony-c-headers)
 
-(setq company-clang-executable "clang++-3.6")
+;; Setup clang executable
+(setq clang-executable "clang++-3.6")
+
+(setq company-clang-executable clang-executable)
 
 ;; (Yes, it really should be two dashes...)
-(setq company-irony-c-headers--compiler-executable "clang++-3.6")
+(setq company-irony-c-headers--compiler-executable clang-executable)
 
-(setq flycheck-c/c++-clang-executable "clang++-3.6")
+(setq flycheck-c/c++-clang-executable clang-executable)
 
 ;; Setting up configurations when c++-mode loads
 (add-hook 'c++-mode-hook
-  '(lambda ()
+          '(lambda ()
 
-  (irony-mode)
+             ;; NOTE: Put a .clang_complete in project root
+             (irony-mode)
 
-  (helm-gtags-mode)
+             (helm-gtags-mode)
 
-  ;; Eldoc-mode - show function call signatures in echo area
-  (eldoc-mode)
-  (irony-eldoc)
+             ;; Eldoc-mode - show function call signatures in echo area
+             (eldoc-mode)
+             (irony-eldoc)
 
-  ;; Flycheck ("Modern on the fly syntax checking")
-  (flycheck-mode)
-  (flycheck-irony-setup)
+             ;; Flycheck ("Modern on the fly syntax checking")
+             (flycheck-mode)
+             (flycheck-irony-setup)
 
-  (set (make-local-variable 'company-backends) '(company-clang company-irony-c-headers company-irony))
+             ;; NOTE: Put a .dir_locals file in project root, containing a
+             ;;       configuration of the company-clang-arguments variable
+             (set (make-local-variable 'company-backends)
+                  '(company-clang company-irony-c-headers company-irony))
 
-  (define-key irony-mode-map [remap completion-at-point]
-    'irony-completion-at-point-async)
+             (define-key irony-mode-map [remap completion-at-point]
+               'irony-completion-at-point-async)
 
-  (define-key irony-mode-map [remap complete-symbol]
-    'irony-completion-at-point-async)
+             (define-key irony-mode-map [remap complete-symbol]
+               'irony-completion-at-point-async)
 
-  (company-irony-setup-begin-commands)
+             (company-irony-setup-begin-commands)
 
-  (irony-cdb-autosetup-compile-options)
+             (irony-cdb-autosetup-compile-options)
 
-  ;; Key binding to auto complete and indent
-  (local-set-key (kbd "TAB") #'company-indent-or-complete-common)
-  ))
+             ;; Key binding to auto complete and indent
+             (local-set-key (kbd "TAB") #'company-indent-or-complete-common)
+
+             (fix-enum-class)
+             ))
 
 ;; Style
 (setq c-default-style "bsd")
 (setq-default c-basic-offset 4)
+(c-set-offset 'innamespace 0)
 
-;; Customize C style 
-(defconst my-cc-style
-  '("cc-mode"
-    (c-offsets-alist . ((innamespace . [0])))))
-
-(c-add-style "my-cc-mode" my-cc-style)
+;; A hack to fix C++11 lambda function indentation
+(defadvice c-lineup-arglist (around my activate)
+  "Improve indentation of continued C++11 lambda function opened as argument."
+  (setq ad-return-value
+        (if (and (equal major-mode 'c++-mode)
+                 (ignore-errors
+                   (save-excursion
+                     (goto-char (c-langelem-pos langelem))
+                     ;; Detect "[...](" or "[...]{". preceded by "," or "(",
+                     ;;   and with unclosed brace.
+                     (looking-at ".*[(,][ \t]*\\[[^]]*\\][ \t]*[({][^}]*$"))))
+            0                           ; no additional indent
+          ad-do-it)))                   ; default behavior
 
 
 ;; ============================================================================
@@ -159,32 +192,32 @@
 
 ;; Setting up configurations when rust-mode loads
 (add-hook 'rust-mode-hook
-  '(lambda ()
-  ;; Racer (Rust Auto Complete-er)
-  (racer-mode)
+          '(lambda ()
+             ;; Racer (Rust Auto Complete-er)
+             (racer-mode)
 
-  ;; NOTE:
-  ;; M-. jumps to declaration
-  ;; M-, jumps back
+             ;; NOTE:
+             ;; M-. jumps to declaration
+             ;; M-, jumps back
 
-  ;; Hook in racer with eldoc to provide documentation
-  (racer-turn-on-eldoc)
+             ;; Hook in racer with eldoc to provide documentation
+             (racer-turn-on-eldoc)
 
-  ;; Flycheck ("Modern on the fly syntax checking")
-  (flycheck-mode)
+             ;; Flycheck ("Modern on the fly syntax checking")
+             (flycheck-mode)
 
-  ;; Use flycheck-rust in rust-mode
-  (flycheck-rust-setup)
+             ;; Use flycheck-rust in rust-mode
+             (flycheck-rust-setup)
 
-  ;; Use company-racer in rust mode
-  (set (make-local-variable 'company-backends) '(company-racer))
+             ;; Use company-racer in rust mode
+             (set (make-local-variable 'company-backends) '(company-racer))
 
-  ;; Key binding to auto complete and indent
-  (local-set-key (kbd "TAB") #'company-indent-or-complete-common)
+             ;; Key binding to auto complete and indent
+             (local-set-key (kbd "TAB") #'company-indent-or-complete-common)
 
-  ;; Format on save
-  (rustfmt-enable-on-save)
-  ))
+             ;; Format on save
+             (rustfmt-enable-on-save)
+             ))
 
 ;; Bind a keyboard shortcut to rustfmt
 ;; (eval-after-load 'rust-mode
@@ -208,7 +241,7 @@
 ;; (add-to-list 'default-frame-alist '(left   . 200))
 ;; (add-to-list 'default-frame-alist '(top    . 160))
 
-;; (setq split-height-threshold 40) 
+;; (setq split-height-threshold 40)
 ;; (setq split-width-threshold 80)
 
 ;; No tab characters!
@@ -232,7 +265,7 @@
  '(custom-enabled-themes (quote (wombat)))
  '(custom-safe-themes (quote ("cd0ae83bc6c947021a6507b5fbae87c33411ff8d6f3a9bf554ce8fed17274bf8" default)))
  '(inhibit-startup-screen t)
- '(safe-local-variable-values (quote ((company-c-headers-path-user quote ("include" "rl_utils/include")) (company-clang-arguments "-std=c++11" "-I/usr/include/SDL2" "-Iinclude" "-Irl_utils/include") (company-c-headers-path-user quote ("/home/martin/dev/ia/include")) (company-clang-arguments "-std=c++11" "-I/usr/include/SDL2" "-I/home/martin/dev/ia/include" "-I/home/martin/dev/ia/rl_utils/include") (company-clang-arguments "-std=c++11" "-I/home/martin/dev/ia/include" "-I/home/martin/dev/ia/rl_utils/include" "-I/usr/include/SDL2"))))
+ '(safe-local-variable-values (quote ((eval progn (require (quote projectile)) (setq company-clang-arguments (delete-dups (append company-clang-arguments (list "-std=c++14" (concat "-I" (projectile-project-root) "include") (concat "-I" (projectile-project-root) "rl_utils/include") (concat "-I" (projectile-project-root) "json/2.0.2/include") "-I/usr/include/SDL2"))))) (eval progn (require (quote projectile)) (setq company-clang-arguments (delete-dups (append company-clang-arguments (list "-std=c++14" (concat "-I" (projectile-project-root) "include") (concat "-I" (projectile-project-root) "rl_utils/include") "-I/usr/include/SDL2"))))) (whitespace-line-column . 80) (whitespace-line-column . 50) (c++-mode (whitespace-line-column . 50) (eval ignore-errors (add-hook (quote write-contents-functions) (lambda nil (delete-trailing-whitespace) nil)) (require (quote whitespace)) (whitespace-mode 0) (whitespace-mode 1))) (eval ignore-errors (add-hook (quote write-contents-functions) (lambda nil (delete-trailing-whitespace) nil)) (require (quote whitespace)) (whitespace-mode 0) (whitespace-mode 1)) (eval ignore-errors "Write-contents-functions is a buffer-local alternative to before-save-hook" (add-hook (quote write-contents-functions) (lambda nil (delete-trailing-whitespace) nil)) (require (quote whitespace)) "Sometimes the mode needs to be toggled off and on." (whitespace-mode 0) (whitespace-mode 1)) (c++-mode (whitespace-line-column . 50)) (eval progn (require (quote projectile)) (setq company-clang-arguments (delete-dups (append company-clang-arguments (list "-std=c++11" (concat "-I" (projectile-project-root) "include") (concat "-I" (projectile-project-root) "rl_utils/include") "-I/usr/include/SDL2"))))) (eval progn (require (quote projectile)) (setq company-clang-arguments (delete-dups (append company-clang-arguments (list (concat "-I" (projectile-project-root) "include") (concat "-I" (projectile-project-root) "rl_utils")))))) (eval progn (require (quote projectile)) (setq company-clang-arguments (delete-dups (append company-clang-arguments (list (concat "-I" (projectile-project-root) "include")))))) (eval progn (require (quote projectile)) (setq company-clang-arguments (delete-dups (append company-clang-arguments (list (concat "-I" (locate-dominating-file default-directory ".dir-locals.el") "include")))))) (company-c-headers-path-user quote ("include")) (company-c-headers-path-user quote ("/home/martin/dev/strategy-game/include")) (company-clang-arguments "-std=c++11" "-I/usr/include/SDL2" "-I/home/martin/dev/strategy-game/include" "-I/home/martin/dev/strategy-game/rl_utils/include") (company-c-headers-path-user quote ("include" "rl_utils/include")) (company-clang-arguments "-std=c++11" "-I/usr/include/SDL2" "-Iinclude" "-Irl_utils/include") (company-c-headers-path-user quote ("/home/martin/dev/ia/include")) (company-clang-arguments "-std=c++11" "-I/usr/include/SDL2" "-I/home/martin/dev/ia/include" "-I/home/martin/dev/ia/rl_utils/include") (company-clang-arguments "-std=c++11" "-I/home/martin/dev/ia/include" "-I/home/martin/dev/ia/rl_utils/include" "-I/usr/include/SDL2"))))
  '(scroll-bar-mode nil)
  '(show-paren-mode t)
  '(tool-bar-mode nil))
