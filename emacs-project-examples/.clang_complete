@@ -1,0 +1,5 @@
+-std=c++14
+-Iinclude
+-Irl_utils/include
+-Ijson/2.0.2/include
+-I/usr/include/SDL2
