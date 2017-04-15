@@ -60,12 +60,7 @@ HISTFILESIZE=2000
 # =============================================================================
 # Setup PS1
 # =============================================================================
-# Set variable identifying the chroot you work in (used in the prompt below)
-if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
-    debian_chroot=$(cat /etc/debian_chroot)
-fi
-
-PS1='${debian_chroot:+($debian_chroot)}'${bblack}'\u@\h:\w'${iwhite}'\n\$ '
+PS1=${bgreen}'\u@\h:\w'${iwhite}'\n\$ '
 
 # =============================================================================
 # Enable color support of ls, and also add handy aliases
@@ -112,9 +107,9 @@ alias dev="cd $HOME/dev"
 # Go to Infra Arcana dev repo
 alias ia="cd $HOME/dev/ia"
 
-# Preferred C/C++ compilers (used by CMake)
-export   C=clang-3.6
-export CXX=clang++-3.6
+# Preferred C/C++ compilers
+export   C=gcc
+export CXX=g++
 
 # =============================================================================
 # Rust stuff
