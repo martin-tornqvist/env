@@ -9,34 +9,26 @@ esac
 # =============================================================================
 # Colors
 # =============================================================================
-  black='\e[0;30m'
-    red='\e[0;31m'
-  green='\e[0;32m'
- yellow='\e[0;33m'
-   blue='\e[0;34m'
- purple='\e[0;35m'
-   cyan='\e[0;36m'
-  white='\e[0;37m'
+clear_clr="\e[0m"
+bold="\e[1m"
+invert="\e[7m"
 
-# Bold
- bblack='\e[1;30m'
-   bred='\e[1;31m'
- bgreen='\e[1;32m'
-byellow='\e[1;33m'
-  bblue='\e[1;34m'
-bpurple='\e[1;35m'
-  bcyan='\e[1;36m'
- bwhite='\e[1;37m'
-
-# High Intensity
- iblack='\e[0;90m'
-   ired='\e[0;91m'
- igreen='\e[0;92m'
-iyellow='\e[0;93m'
-  iblue='\e[0;94m'
-ipurple='\e[0;95m'
-  icyan='\e[0;96m'
- iwhite='\e[0;97m'
+black="\e[30m"
+red="\e[31m"
+green="\e[32m"
+yellow="\e[33m"
+blue="\e[34m"
+purple="\e[35m"
+cyan="\e[36m"
+light_gray="\e[37m"
+gray="\e[90m"
+light_red="\e[91m"
+light_green="\e[92m"
+light_yellow="\e[93m"
+light_blue="\e[94m"
+light_purple="\e[95m"
+light_cyan="\e[96m"
+white="\e[97m"
 
 # =============================================================================
 # History
@@ -60,7 +52,7 @@ HISTFILESIZE=2000
 # =============================================================================
 # Setup PS1
 # =============================================================================
-PS1=${bgreen}'\u@\h:\w'${iwhite}'\n\$ '
+PS1=${yellow}'[$?]'${gray}' \u@\h'${light_cyan}'$(__git_ps1 " (%s)")'${light_green}' \w'${clear_clr}'\n\$ '
 
 # =============================================================================
 # Enable color support of ls, and also add handy aliases

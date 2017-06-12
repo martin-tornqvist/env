@@ -18,7 +18,7 @@
   (package-refresh-contents))
 
 ;;
-;; NOTE: Packages can be installed/uninstalled with M-x package-list-packages
+;; NOTE: Packages can be installed/uninstalled with M-x list-packages
 ;; U-x upgrades all packages
 ;;
 
@@ -93,7 +93,7 @@
 
 ;; Shortcut keys for helm-gtags key(s)
 ;; Find pattern
-(define-key helm-gtags-mode-map (kbd "<f6>") 'helm-gtags-find-pattern)
+;; (define-key helm-gtags-mode-map (kbd "<f6>") 'helm-gtags-find-pattern)
 
 ;; Whitespace mode
 ;; NOTE: Set whitespace-line-column in projects dir_locals file
@@ -112,6 +112,16 @@
 ;; Subword mode (to treat camelcase words as separate words)
 (global-subword-mode 1)
 
+;; Show line numbers in margin
+(global-linum-mode)
+
+;; Recompile, next error, previous error
+(global-set-key (kbd "<f6>") 'recompile)
+(global-set-key (kbd "<f7>") 'next-error)
+(global-set-key (kbd "S-<f7>") 'previous-error)
+
+;; Scroll "compilation" buffer
+(setq compilation-scroll-output t)
 
 ;; ============================================================================
 ;; C/C++
@@ -271,10 +281,10 @@
    ["#212526" "#ff4b4b" "#b4fa70" "#fce94f" "#729fcf" "#ad7fa8" "#8cc4ff" "#eeeeec"])
  '(column-number-mode t)
  '(compilation-message-face (quote default))
- '(custom-enabled-themes (quote (cyberpunk)))
+ '(custom-enabled-themes (quote (ample)))
  '(custom-safe-themes
    (quote
-    ("a93bb5819f8e572e61be35e5645a5b9393434525a1c8989a6519724ad5dcc647" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "82d2cac368ccdec2fcc7573f24c3f79654b78bf133096f9b40c20d97ec1d8016" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "06b2849748590f7f991bf0aaaea96611bb3a6982cad8b1e3fc707055b96d64ca" "fe230d2861a13bb969b5cdf45df1396385250cc0b7933b8ab9a2f9339b455f5c" "331433979cba7e5db23375e231e9216b2eb1d0b7977a3b327560b4dd6a2ef1ec" "4d886950135ac65bcaeaad1b7cba07696889ee6cec5b0337de561ea883ee99d6" "bd583f860cb323b5083f8bec3216d877561210ae820cb508d7a6ae2b73b3cff9" "a388014bace6f437697718697d7851ef57f4f1cb069a4b48444b0dcbdb5fd048" "cd0ae83bc6c947021a6507b5fbae87c33411ff8d6f3a9bf554ce8fed17274bf8" default)))
+    ("235dc2dd925f492667232ead701c450d5c6fce978d5676e54ef9ca6dd37f6ceb" "1db337246ebc9c083be0d728f8d20913a0f46edc0a00277746ba411c149d7fe5" "938d8c186c4cb9ec4a8d8bc159285e0d0f07bad46edf20aa469a89d0d2a586ea" "6de7c03d614033c0403657409313d5f01202361e35490a3404e33e46663c2596" "ed317c0a3387be628a48c4bbdb316b4fa645a414838149069210b66dd521733f" "38e64ea9b3a5e512ae9547063ee491c20bd717fe59d9c12219a0b1050b439cdd" "a93bb5819f8e572e61be35e5645a5b9393434525a1c8989a6519724ad5dcc647" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "82d2cac368ccdec2fcc7573f24c3f79654b78bf133096f9b40c20d97ec1d8016" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "06b2849748590f7f991bf0aaaea96611bb3a6982cad8b1e3fc707055b96d64ca" "fe230d2861a13bb969b5cdf45df1396385250cc0b7933b8ab9a2f9339b455f5c" "331433979cba7e5db23375e231e9216b2eb1d0b7977a3b327560b4dd6a2ef1ec" "4d886950135ac65bcaeaad1b7cba07696889ee6cec5b0337de561ea883ee99d6" "bd583f860cb323b5083f8bec3216d877561210ae820cb508d7a6ae2b73b3cff9" "a388014bace6f437697718697d7851ef57f4f1cb069a4b48444b0dcbdb5fd048" "cd0ae83bc6c947021a6507b5fbae87c33411ff8d6f3a9bf554ce8fed17274bf8" default)))
  '(fci-rule-color "#20240E")
  '(highlight-changes-colors (quote ("#FD5FF0" "#AE81FF")))
  '(highlight-tail-colors
@@ -456,6 +466,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "DejaVu Sans Mono" :foundry "unknown" :slant normal :weight normal :height 98 :width normal)))))
+ '(default ((t (:family "Terminus" :foundry "xos4" :slant normal :weight normal :height 105 :width normal)))))
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
