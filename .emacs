@@ -121,7 +121,8 @@
 (global-set-key (kbd "S-<f7>") 'previous-error)
 
 ;; Scroll "compilation" buffer
-(setq compilation-scroll-output t)
+;; (setq compilation-scroll-output t)
+(setq compilation-scroll-output 'first-error)
 
 ;; ============================================================================
 ;; C/C++
@@ -299,6 +300,7 @@
      ("#20240E" . 100))))
  '(inhibit-startup-screen t)
  '(magit-diff-use-overlays nil)
+ '(menu-bar-mode nil)
  '(nrepl-message-colors
    (quote
     ("#CC9393" "#DFAF8F" "#F0DFAF" "#7F9F7F" "#BFEBBF" "#93E0E3" "#94BFF3" "#DC8CC3")))

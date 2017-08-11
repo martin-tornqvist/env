@@ -52,7 +52,7 @@ HISTFILESIZE=2000
 # =============================================================================
 # Setup PS1
 # =============================================================================
-PS1=${yellow}'[$?]'${gray}' \u@\h'${light_cyan}'$(__git_ps1 " (%s)")'${light_green}' \w'${clear_clr}'\n\$ '
+PS1=${yellow}'[$?]'${gray}' \u@\h'${light_cyan}'$(__git_ps1 " (%s)")'${purple}' \w'${clear_clr}'\n\$ '
 
 # =============================================================================
 # Enable color support of ls, and also add handy aliases
