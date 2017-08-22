@@ -108,6 +108,9 @@ alias dev="cd $HOME/dev"
 # Go to Infra Arcana dev repo
 alias ia="cd $HOME/dev/ia"
 
+# Go to loekchipz
+alias lc="cd $HOME/dev/loekchipz"
+
 # Preferred C/C++ compilers
 export   C=gcc
 export CXX=g++
@@ -115,9 +118,15 @@ export CXX=g++
 # =============================================================================
 # Rust stuff
 # =============================================================================
-# Cargo - Rust "crate host"
-export PATH=$PATH:/home/martin/.cargo/bin
+export PATH=/home/martin/dev/rust-install/bin:$PATH
+
+export PATH=/home/martin/.cargo/bin:$PATH
 
 export RUST_SRC_PATH=/home/martin/dev/rust/src
 
 export CARGO_HOME=/home/martin/.cargo
+
+# =============================================================================
+# Print timestamps on bash commands
+# =============================================================================
+trap 'echo -e "${bold}${light_gray}${invert}$(ts)${clear_clr}"' DEBUG
