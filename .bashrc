@@ -98,6 +98,7 @@ alias bashrc="emacs $HOME/.bashrc &"
 
 alias findf="find . -type f -name "
 alias gg="git grep"
+alias gs="git fetch --all --prune ; git st"
 
 alias u="cd .."
 alias b="cd -"
@@ -111,7 +112,9 @@ alias ia="cd $HOME/dev/ia"
 # Go to loekchipz
 alias lc="cd $HOME/dev/loekchipz"
 
+# =============================================================================
 # Preferred C/C++ compilers
+# =============================================================================
 export   C=gcc
 export CXX=g++
 
