@@ -7,7 +7,7 @@ case $- in
 esac
 
 # =============================================================================
-# Colors
+# Color definitions
 # =============================================================================
 clear_clr="\e[0m"
 bold="\e[1m"
@@ -50,12 +50,12 @@ HISTFILESIZE=2000
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
 # =============================================================================
-# Setup PS1
+# PS1
 # =============================================================================
-PS1=${yellow}'[$?]'${gray}' \u@\h'${light_cyan}'$(__git_ps1 " (%s)")'${purple}' \w'${clear_clr}'\n\$ '
+PS1=${yellow}'[$?]'${gray}' \u@\h'${gray}'$(__git_ps1 " (%s)")'${gray}' \w'${clear_clr}'\n\$ '
 
 # =============================================================================
-# Enable color support of ls, and also add handy aliases
+# Coloring for ls and grep
 # =============================================================================
 if [ -x /usr/bin/dircolors ]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
@@ -79,7 +79,6 @@ if ! shopt -oq posix; then
   fi
 fi
 
-
 # =============================================================================
 # Timestamp function
 # =============================================================================
@@ -89,27 +88,40 @@ function ts()
 }
 
 # =============================================================================
-# Aliases
+# ll alias (must be defined before the cd function below)
 # =============================================================================
-alias ll="ls -alhF --group-directories-first"
-alias l="ll"
-alias emacs="emacs -fs"
-alias bashrc="emacs $HOME/.bashrc &"
+alias ll="ls -Alhtr --classify --group-directories-first"
 
-alias findf="find . -type f -name "
+# =============================================================================
+# cd function
+# =============================================================================
+function cd_and_ll()
+{
+    cd $1
+    ll
+}
+
+# =============================================================================
+# Misc aliases
+# =============================================================================
+alias bashrc="emacs ~/.bashrc &"
+
+alias emacs="emacs -fs"
+
 alias gg="git grep"
 alias gs="git fetch --all --prune ; git st"
 
 alias u="cd .."
-alias b="cd -"
 
-# Go to dev folder
+alias cd="cd_and_ll"
+
+# Go to dev directory
 alias dev="cd $HOME/dev"
 
-# Go to Infra Arcana dev repo
+# Go to Infra Arcana repo
 alias ia="cd $HOME/dev/ia"
 
-# Go to loekchipz
+# Go to loekchipz repo
 alias lc="cd $HOME/dev/loekchipz"
 
 # =============================================================================
@@ -132,4 +144,4 @@ export CARGO_HOME=/home/martin/.cargo
 # =============================================================================
 # Print timestamps on bash commands
 # =============================================================================
-trap 'echo -e "${bold}${light_gray}${invert}$(ts)${clear_clr}"' DEBUG
+trap 'echo -e "${invert}$(ts)${clear_clr}"' DEBUG
