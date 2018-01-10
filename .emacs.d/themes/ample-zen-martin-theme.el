@@ -1,5 +1,5 @@
 (deftheme ample-zen-martin
-  "Created 2017-11-08.")
+  "Created 2017-11-30.")
 
 (custom-theme-set-variables
  'ample-zen-martin
@@ -44,9 +44,8 @@
  '(font-lock-regexp-grouping-backslash ((t (:foreground "#6aaf50"))))
  '(font-lock-string-face ((t (:foreground "green3"))))
  '(font-lock-type-face ((t (:foreground "NavajoWhite4"))))
- '(font-lock-variable-name-face ((t (:foreground "goldenrod"))))
+ '(font-lock-variable-name-face ((t (:foreground "goldenrod3"))))
  '(font-lock-warning-face ((t (:foreground "#baba36"))))
- '(linum ((t (:foreground "#6a9550" :background "#212121"))))
  '(show-paren-mismatch ((t (:background "#212121" :foreground "#ff5542"))))
  '(show-paren-match ((t (:background "#888888" :foreground "#000000"))))
  '(whitespace-space ((t (:background "#141414" :foreground "#141414"))))
@@ -54,12 +53,12 @@
  '(whitespace-tab ((t (:background "#dd5542"))))
  '(whitespace-newline ((t (:foreground "#141414"))))
  '(whitespace-trailing ((t (:background "#ff0000"))))
- '(whitespace-line ((t (:foreground "red" :underline t))))
+ '(whitespace-line ((t (:inherit default :background "darkred"))))
  '(whitespace-space-before-tab ((t (:background "#fb8512" :foreground "#fb8512"))))
  '(whitespace-indentation ((t (:background "#7d7c61" :foreground "#CC5542"))))
  '(whitespace-empty ((t (:background "#7d7c61"))))
  '(whitespace-space-after-tab ((t (:background "#7d7c61" :foreground "#CC5542"))))
  '(which-func ((t (:foreground "#6a7550"))))
- '(default ((t (:background "gray12" :foreground "wheat3")))))
+ '(default ((t (:background "gray13" :foreground "wheat3")))))
 
 (provide-theme 'ample-zen-martin)

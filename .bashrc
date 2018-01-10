@@ -1,10 +1,20 @@
+export LANG=en_US.UTF-8
+export LC_MESSAGES="C"
+
 # =============================================================================
 # If not running interactively, don't do anything
 # =============================================================================
-case $- in
-    *i*) ;;
-      *) return;;
-esac
+# If not running interactively, don't do anything
+[[ $- != *i* ]] && return
+
+# =============================================================================
+# Git auto complete and prompt settings
+# =============================================================================
+. /usr/share/git/completion/git-completion.bash
+. /usr/share/git/completion/git-prompt.sh
+
+GIT_PS1_SHOWSTASHSTATE=true
+GIT_PS1_SHOWDIRTYSTATE=true
 
 # =============================================================================
 # Color definitions
@@ -71,13 +81,13 @@ fi
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
 # =============================================================================
-if ! shopt -oq posix; then
-  if [ -f /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/bash_completion
-  elif [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
-  fi
-fi
+# if ! shopt -oq posix; then
+#   if [ -f /usr/share/bash-completion/bash_completion ]; then
+#     . /usr/share/bash-completion/bash_completion
+#   elif [ -f /etc/bash_completion ]; then
+#     . /etc/bash_completion
+#   fi
+# fi
 
 # =============================================================================
 # Timestamp function
@@ -95,10 +105,10 @@ alias ll="ls -Alhtr --classify --group-directories-first"
 # =============================================================================
 # cd function
 # =============================================================================
-function cd_and_ll()
+function cd_and_ls()
 {
     cd $1
-    ll
+    ls
 }
 
 # =============================================================================
@@ -113,7 +123,7 @@ alias gs="git fetch --all --prune ; git st"
 
 alias u="cd .."
 
-alias cd="cd_and_ll"
+alias cd="cd_and_ls"
 
 # Go to dev directory
 alias dev="cd $HOME/dev"
@@ -144,4 +154,4 @@ export CARGO_HOME=/home/martin/.cargo
 # =============================================================================
 # Print timestamps on bash commands
 # =============================================================================
-trap 'echo -e "${invert}$(ts)${clear_clr}"' DEBUG
+# trap 'echo -e "${invert}$(ts)${clear_clr}"' DEBUG
