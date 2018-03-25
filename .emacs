@@ -4,6 +4,7 @@
 ;; (require 'cl-lib)
 (require 'cl)
 
+
 ;; ============================================================================
 ;; Allow Emacs to install packages from MELPA
 ;; ("Milkypostman's Emacs Lisp Package Archive)
@@ -33,7 +34,7 @@
 
 ;; Tab to tab stop
 (global-set-key (kbd "<C-tab>") 'tab-to-tab-stop)
-(setq tab-stop-list (number-sequence 4 200 4))
+;; (setq tab-stop-list (number-sequence 4 200 4))
 
 ;; Rebind tab to do persistent action
 ;; (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action)
@@ -141,6 +142,7 @@
 (add-to-list 'same-window-buffer-names "*helm M-x*")
 (add-to-list 'same-window-buffer-names "*helm mini*")
 
+
 ;; ============================================================================
 ;; C/C++
 ;; ============================================================================
@@ -180,7 +182,7 @@
              (flycheck-irony-setup)
 
              ;; NOTE: Put a .dir_locals file in project root, containing a
-             ;;       configuration of the company-clang-arguments variable
+             ;; configuration of the company-clang-arguments variable
              (set (make-local-variable 'company-backends)
                   '(company-irony company-clang company-irony-c-headers))
 
@@ -210,7 +212,7 @@
 
 ;; Style
 (setq c-default-style "bsd")
-(setq-default c-basic-offset 4)
+(setq-default c-basic-offset 8)
 (c-set-offset 'innamespace 0)
 
 ;; A hack to fix C++11 lambda function indentation
@@ -232,7 +234,7 @@
 ;; Rust
 ;; ============================================================================
 ;; Racer - Code completion for Rust
-(setq racer-cmd "/home/martin/.cargo/bin/racer")
+(setq racer-cmd "racer")
 (setq racer-rust-src-path "/home/martin/dev/rust/src/")
 
 ;; Load rust-mode when you open `.rs` files
@@ -274,6 +276,13 @@
 ;; Style
 (setq-default rust-indent-offset 4)
 
+
+;; ============================================================================
+;; xml
+;; ============================================================================
+(setq nxml-child-indent 4 nxml-attribute-indent 4)
+
+
 ;; ============================================================================
 ;; Misc
 ;; ============================================================================
@@ -313,5 +322,51 @@
                     :weight 'normal
                     :width 'normal)
 
-;; TODO: Do not use ":all"
 (setq enable-local-variables :safe)
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ansi-color-faces-vector
+   [default default default italic underline success warning error])
+ '(ansi-color-names-vector
+   ["#212121" "#CC5542" "#6aaf50" "#7d7c61" "#5180b3" "#DC8CC3" "#9b55c3" "#bdbdb3"])
+ '(company-clang-insert-arguments nil)
+ '(custom-enabled-themes (quote (martin)))
+ '(custom-safe-themes
+   (quote
+    ("fe3dbede82c10d84366ec3f738850d6e043b7080a13fb8f5cbba47ae50bb9a7d" "850fc539df597f449e206a60d4b00a7fba0e23202e8987f0f1a17c272d069341" "e77006afeb855af2b5ab148ebb697de23539362bb29e7f9bed2267588498b22f" "cf574f5ecdaa5527e4111afb3aa0fbf5849b51e84100636f5a3f96f96ed00f4c" "348ca59ab1db997cc3c0981d14256dbd77866d82578fd47c1ef3d3276d588539" "d6290003ee8ac467ceba21163e936f122106a2fb5797846f98e94c3c69b6c2d0" "02b200083bc2ff0b840f6440e66c35d625cbf15c0f67abbb956fa527b0171393" "427621cbeed47edcd402171ae3b230d39f839d46c60fc8beb7848bcf9c8986e3" "a2994a65906acb4a3719f5bedb6ef4c21589c12f6b27d79016885ce1412be2af" "93ce12ed10cdb0757c6f0df50eb6df00bbd8e00fd9c3b15315e760bdabba1e63" "194335498cce57c7fa0ea59baffd6e98d64ef9a047e0a34263a110432e468b3a" "d11ca8dc52949e95374b5dd23374a929f5308c96c97f194be3bac256a2b0028b" "13da46a7f28e5e6b00a19d9a3466ba02b7d367fa8de4ad6410b2b7b97fba56b7" "07647d69705e4c709183be122b7d76ebc8b60c2859765f1a48f480da932695be" "da92b9185b1e60a0e02d566304f0673b37b12eb519522e5a0b04da032674fe79" "e0437da5709ce4dcb723d05e6286a5de9a411a1ae12199facf40304618cd5483" "877b6a0d588e2225b9bb8be2144345bbaa671e8ad1e5a76ffbc518e1ecc2aabd" "d6922c974e8a78378eacb01414183ce32bc8dbf2de78aabcc6ad8172547cb074" "1db337246ebc9c083be0d728f8d20913a0f46edc0a00277746ba411c149d7fe5" "ee89863f86247942d9fc404d47b2704475b146c079c1dcd2390d697ddfa9bdf4" "87073e92c4437df15f127e18cb05b2832c99689201c4d81dee3c20c7197d62e7" "adde823697efd8b7532eb0406b60903310979b334e431f35d282399d6655512e" "1af1cc4b157451aa0a370f09dd2fa4e2619b82938fe35fedd6487c92eb3eda0f" "c84a6d48bd840fc3dc719847efb33ee5cc58ebe09daf954dd6cb304bcd751101" "fe4086cd8ecdba0167ed3d6b94752191d310bc3661f71b82177b009ed816bff3" "50c5b6220b6a8e0d7fb01908e60779dee33566bb3b36d7c4443618ddb5418068" "433961d325be046c56a220db2d94b85d756772fe1e502b1cdaf31e2e1ec091a1" "fcc3963285e9c9074d6f34596ff333430ad3825dab37b277931e2b789b94c369" "a1035b15c35eaa41a08d0344655163ba417638cea0b062ff2fb62524a5acfe2f" "900cb33814d1b508576259ccfbb8dd0b03d748a24241a925638ad3f7d249338c" "795f05f6b20dc4348594d631e7f79097ea514764371537587f07ac7e934a2159" "6b36b4d5235bc176b3a3cc9f506c78849165222a5185ad58fb8d6b0011dd95c1" "d4a3aad9ebcc68893a9ce6624488fe2255419df70f9a13ed5f30df32bc9e48d5" "fcd916898113e53a8148edbd8c3c574b87205d5fcdabb1920d17eaddd8c24f36" "8a3d45b6408c449306532e46823f75e2525ffd726e2d1b9a722be2b47a212ef3" "92583e2918bf3d3254af565b624318498edd6c142a23c0d594368c129997d1c4" "d1b31e42ac44a8b70311c210bd7eb2b324fc3242e98c91c2a22ad9badd3872dc" default)))
+ '(fci-rule-color "#383838")
+ '(package-selected-packages
+   (quote
+    (window-numbering racer projectile irony-eldoc helm-gtags flycheck-rust flycheck-irony cyberpunk-theme company-racer company-irony-c-headers company-irony ample-zen-theme ample-theme)))
+ '(vc-annotate-background "#3b3b3b")
+ '(vc-annotate-color-map
+   (quote
+    ((20 . "#dd5542")
+     (40 . "#CC5542")
+     (60 . "#fb8512")
+     (80 . "#baba36")
+     (100 . "#bdbc61")
+     (120 . "#7d7c61")
+     (140 . "#6abd50")
+     (160 . "#6aaf50")
+     (180 . "#6aa350")
+     (200 . "#6a9550")
+     (220 . "#6a8550")
+     (240 . "#6a7550")
+     (260 . "#9b55c3")
+     (280 . "#6CA0A3")
+     (300 . "#528fd1")
+     (320 . "#5180b3")
+     (340 . "#6380b3")
+     (360 . "#DC8CC3"))))
+ '(vc-annotate-very-old-color "#DC8CC3"))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )

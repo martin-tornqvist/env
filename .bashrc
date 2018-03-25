@@ -17,30 +17,6 @@ GIT_PS1_SHOWSTASHSTATE=true
 GIT_PS1_SHOWDIRTYSTATE=true
 
 # =============================================================================
-# Color definitions
-# =============================================================================
-clear_clr="\e[0m"
-bold="\e[1m"
-invert="\e[7m"
-
-black="\e[30m"
-red="\e[31m"
-green="\e[32m"
-yellow="\e[33m"
-blue="\e[34m"
-purple="\e[35m"
-cyan="\e[36m"
-light_gray="\e[37m"
-gray="\e[90m"
-light_red="\e[91m"
-light_green="\e[92m"
-light_yellow="\e[93m"
-light_blue="\e[94m"
-light_purple="\e[95m"
-light_cyan="\e[96m"
-white="\e[97m"
-
-# =============================================================================
 # History
 # =============================================================================
 # Don't put duplicate lines or lines starting with space in the history.
@@ -60,9 +36,33 @@ HISTFILESIZE=2000
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
 # =============================================================================
+# Color codes
+# =============================================================================
+# clear_clr     \[\e[0m\]
+# bold          \[\e[1m\]
+# invert        \[\e[7m\]
+
+# black         \[\e[30m\]
+# red           \[\e[31m\]
+# green         \[\e[32m\]
+# yellow        \[\e[33m\]
+# blue          \[\e[34m\]
+# purple        \[\e[35m\]
+# cyan          \[\e[36m\]
+# light_gray    \[\e[37m\]
+# gray          \[\e[90m\]
+# light_red     \[\e[91m\]
+# light_green   \[\e[92m\]
+# light_yellow  \[\e[93m\]
+# light_blue    \[\e[94m\]
+# light_purple  \[\e[95m\]
+# light_cyan    \[\e[96m\]
+# white         \[\e[97m\]
+
+# =============================================================================
 # PS1
 # =============================================================================
-PS1=${yellow}'[$?]'${gray}' \u@\h'${gray}'$(__git_ps1 " (%s)")'${gray}' \w'${clear_clr}'\n\$ '
+PS1='\[\e[33m\][$?]\[\e[32m\]$(__git_ps1 " (%s)") \W \$\[\e[0m\] '
 
 # =============================================================================
 # Coloring for ls and grep
@@ -98,18 +98,18 @@ function ts()
 }
 
 # =============================================================================
-# ll alias (must be defined before the cd function below)
+# ll alias
 # =============================================================================
 alias ll="ls -Alhtr --classify --group-directories-first"
 
 # =============================================================================
 # cd function
 # =============================================================================
-function cd_and_ls()
-{
-    cd $1
-    ls
-}
+# function cd_and_ls()
+# {
+#     cd $1
+#     ls
+# }
 
 # =============================================================================
 # Misc aliases
@@ -123,7 +123,7 @@ alias gs="git fetch --all --prune ; git st"
 
 alias u="cd .."
 
-alias cd="cd_and_ls"
+# alias cd="cd_and_ls"
 
 # Go to dev directory
 alias dev="cd $HOME/dev"
@@ -137,21 +137,17 @@ alias lc="cd $HOME/dev/loekchipz"
 # =============================================================================
 # Preferred C/C++ compilers
 # =============================================================================
-export   C=gcc
+export C=gcc
+
 export CXX=g++
 
 # =============================================================================
 # Rust stuff
 # =============================================================================
-export PATH=/home/martin/dev/rust-install/bin:$PATH
+# export PATH=/home/martin/dev/rust-install/bin:$PATH
 
-export PATH=/home/martin/.cargo/bin:$PATH
+# export PATH=/home/martin/.cargo/bin:$PATH
 
 export RUST_SRC_PATH=/home/martin/dev/rust/src
 
-export CARGO_HOME=/home/martin/.cargo
-
-# =============================================================================
-# Print timestamps on bash commands
-# =============================================================================
-# trap 'echo -e "${invert}$(ts)${clear_clr}"' DEBUG
+# export CARGO_HOME=/home/martin/.cargo

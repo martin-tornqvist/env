@@ -1,5 +1,5 @@
 (deftheme martin
-  "Created 2017-12-06.")
+  "Created 2018-03-05.")
 
 (custom-theme-set-variables
  'martin
@@ -33,18 +33,18 @@
  '(isearch-fail ((t (:background "red4" :foreground "#bdbdb3"))))
  '(lazy-highlight ((t (:background "#2e2e2e" :foreground "#baba36"))))
  '(font-lock-builtin-face ((t (:foreground "#bdbdb3"))))
- '(font-lock-comment-face ((t (:foreground "orangered"))))
+ '(font-lock-comment-face ((t (:foreground "gray50"))))
  '(font-lock-constant-face ((t (:foreground "#6a7550"))))
  '(font-lock-doc-face ((t (:foreground "#6a9550"))))
  '(font-lock-function-name-face ((t (:foreground "darkolivegreen3"))))
  '(font-lock-keyword-face ((t (:foreground "navajowhite4"))))
- '(font-lock-negation-char-face ((t (:foreground "#7d7c61"))))
+ '(font-lock-negation-char-face ((t (:foreground "red"))))
  '(font-lock-preprocessor-face ((t (:foreground "#6380b3"))))
  '(font-lock-regexp-grouping-construct ((t (:foreground "#7d7c61"))))
  '(font-lock-regexp-grouping-backslash ((t (:foreground "#6aaf50"))))
  '(font-lock-string-face ((t (:foreground "forestgreen"))))
  '(font-lock-type-face ((t (:foreground "NavajoWhite4"))))
- '(font-lock-variable-name-face ((t (:foreground "goldenrod3"))))
+ '(font-lock-variable-name-face ((t (:foreground "goldenrod"))))
  '(font-lock-warning-face ((t (:foreground "#baba36"))))
  '(show-paren-mismatch ((t (:background "#212121" :foreground "#ff5542"))))
  '(show-paren-match ((t (:background "#888888" :foreground "#000000"))))
@@ -53,7 +53,7 @@
  '(whitespace-tab ((t (:background "#dd5542"))))
  '(whitespace-newline ((t (:foreground "#141414"))))
  '(whitespace-trailing ((t (:background "darkred"))))
- '(whitespace-line ((t (:background "darkred" :inherit default))))
+ '(whitespace-line ((t (:background "black" :foreground "red"))))
  '(whitespace-space-before-tab ((t (:background "#fb8512" :foreground "#fb8512"))))
  '(whitespace-indentation ((t (:background "#7d7c61" :foreground "#CC5542"))))
  '(whitespace-empty ((t (:background "#7d7c61"))))
