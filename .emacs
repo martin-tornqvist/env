@@ -94,13 +94,6 @@
 ;; Find pattern
 ;; (define-key helm-gtags-mode-map (kbd "<f6>") 'helm-gtags-find-pattern)
 
-;; Whitespace mode
-;; NOTE: Set whitespace-line-column in projects dir_locals file
-;;       (May requiring restarting whitespace-mode afterwards)
-(require 'whitespace)
-(setq whitespace-style '(face empty tabs lines-tail trailing))
-(global-whitespace-mode t)
-
 ;; Numbered windows (jump to specific window with M-#)
 (require 'window-numbering)
 (window-numbering-mode)
@@ -207,7 +200,8 @@
 
              ;; Whitespace mode
              (require 'whitespace)
-             (whitespace-mode 1)
+             (setq whitespace-style '(face empty tabs lines-tail trailing))
+             (global-whitespace-mode t)
              ))
 
 ;; Style
